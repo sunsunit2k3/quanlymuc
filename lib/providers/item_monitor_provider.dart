@@ -24,5 +24,6 @@ class ItemMonitorProvider extends InheritedWidget {
 
   void addItem(Item item) {
     items.add(item);
+    print('Item added: ${item.name}');
   }
 }

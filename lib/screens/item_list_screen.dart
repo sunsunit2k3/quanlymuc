@@ -2,51 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:test_app/providers/item_monitor_provider.dart';
 import 'package:test_app/screens/add_item_screen.dart';
 
-class ItemListScreen extends StatelessWidget {
+class ItemListScreen extends StatefulWidget {
   const ItemListScreen({super.key});
 
+  @override
+  State<ItemListScreen> createState() => _ItemListScreenState();
+}
+
+class _ItemListScreenState extends State<ItemListScreen> {
   @override
   Widget build(BuildContext context) {
     final provider = ItemMonitorProvider.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Danh sách mục'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (_) {
-                  return AlertDialog(
-                    title: const Text('Thêm item mới'),
-                    content: AddItemScreen(
-                      provider: provider,
-                      onItemAdded: (newItem) {
-                        provider?.addItem(newItem);
-                        print({
-                          'Item added: ${newItem.name}',
-                          'Value: ${newItem.value}',
-                          'Is Monitoring: ${newItem.isMonitoring}',
-                        });
-                      },
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('Đóng'),
-                      ),
-                    ],
-                  );
-                },
-              );
-            },
-          ),
-        ],
-      ),
+      appBar: AppBar(title: const Text('Danh sách mục')),
       body: ListView.builder(
         itemCount: provider?.items.length ?? 0,
         itemBuilder: (context, index) {
@@ -61,6 +30,48 @@ class ItemListScreen extends StatelessWidget {
             onTap: () => provider.toggleMonitoring(item),
           );
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (_) {
+              return Dialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Text('Thêm mục mới'),
+                    ),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('Cập nhật'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('Đóng'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        },
+        child: const Icon(Icons.add),
       ),
     );
   }
