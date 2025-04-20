@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:test_app/models/item_model.dart';
+import 'package:test_app/preferences_manager.dart';
 
 class ItemMonitorProvider extends InheritedWidget {
   final List<Item> items;
   final List<Item> monitoringItem;
   final void Function(Item item) toggleMonitoring;
+
   const ItemMonitorProvider({
     super.key,
     required super.child,
@@ -12,6 +14,7 @@ class ItemMonitorProvider extends InheritedWidget {
     required this.monitoringItem,
     required this.toggleMonitoring,
   });
+
   static ItemMonitorProvider? of(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<ItemMonitorProvider>();
   }
@@ -24,6 +27,11 @@ class ItemMonitorProvider extends InheritedWidget {
 
   void addItem(Item item) {
     items.add(item);
-    print('Item added: ${item.name}');
+    PreferencesManager.saveItems(items);
+  }
+
+  void removeItem(Item item) {
+    items.remove(item);
+    PreferencesManager.saveItems(items);
   }
 }
