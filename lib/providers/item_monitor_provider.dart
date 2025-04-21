@@ -5,14 +5,18 @@ import 'package:test_app/preferences_manager.dart';
 class ItemMonitorProvider extends InheritedWidget {
   final List<Item> items;
   final List<Item> monitoringItem;
+  final List<Item> addToCartItem;
   final void Function(Item item) toggleMonitoring;
+  final void Function(Item item) addingToCart;
 
   const ItemMonitorProvider({
     super.key,
     required super.child,
     required this.items,
     required this.monitoringItem,
+    required this.addToCartItem,
     required this.toggleMonitoring,
+    required this.addingToCart,
   });
 
   static ItemMonitorProvider? of(BuildContext context) {
@@ -33,5 +37,10 @@ class ItemMonitorProvider extends InheritedWidget {
   void removeItem(Item item) {
     items.remove(item);
     PreferencesManager.saveItems(items);
+  }
+
+  void remove(Item item) {
+    items.remove(item);
+    PreferencesManager.saveCartItems(items);
   }
 }

@@ -7,9 +7,13 @@ class ItemMonitoringScreen extends StatefulWidget {
   State<ItemMonitoringScreen> createState() => _ItemMonitoringScreenState();
 }
 
-class _ItemMonitoringScreenState extends State<ItemMonitoringScreen> {
+class _ItemMonitoringScreenState extends State<ItemMonitoringScreen>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final provider = ItemMonitorProvider.of(context);
 
     return Scaffold(

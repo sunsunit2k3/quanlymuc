@@ -9,10 +9,15 @@ class ItemListScreen extends StatefulWidget {
   State<ItemListScreen> createState() => _ItemListScreenState();
 }
 
-class _ItemListScreenState extends State<ItemListScreen> {
+class _ItemListScreenState extends State<ItemListScreen>
+    with AutomaticKeepAliveClientMixin {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController valueController = TextEditingController();
+  final TextEditingController priceController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void dispose() {
@@ -23,6 +28,7 @@ class _ItemListScreenState extends State<ItemListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final provider = ItemMonitorProvider.of(context);
 
     return Scaffold(
@@ -36,7 +42,7 @@ class _ItemListScreenState extends State<ItemListScreen> {
                 itemBuilder: (context, index) {
                   final item = provider.items[index];
                   return Dismissible(
-                    key: ValueKey(item.name + item.value), // More unique key
+                    key: ValueKey(item.name + item.value),
                     direction: DismissDirection.endToStart,
                     onDismissed: (direction) {
                       setState(() {
@@ -54,19 +60,41 @@ class _ItemListScreenState extends State<ItemListScreen> {
                     ),
                     child: ListTile(
                       key: ValueKey('item_${item.name}_${item.value}'),
-                      title: Text(item.name),
-                      subtitle: Text(item.value),
-                      trailing: Icon(
-                        item.isMonitoring
-                            ? Icons.check_box
-                            : Icons.check_box_outline_blank,
+                      title: Text("Item: ${item.name} - Value: ${item.value}"),
+                      subtitle: Text("${item.price} VNĐ"),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: Icon(
+                              item.isMonitoring
+                                  ? Icons.check_box
+                                  : Icons.check_box_outline_blank,
+                            ),
+                            onPressed: () {
+                              provider.toggleMonitoring(item);
+                              setState(() {
+                                item.isMonitoring = !item.isMonitoring;
+                              });
+                            },
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              item.isInCart
+                                  ? Icons.shopping_cart
+                                  : Icons.shopping_cart_outlined,
+                              color: item.isInCart ? Colors.green : null,
+                            ),
+                            onPressed: () {
+                              provider.addingToCart(item);
+                              setState(() {
+                                item.isInCart =
+                                    !item.isInCart; // Toggle cart state
+                              });
+                            },
+                          ),
+                        ],
                       ),
-                      onTap: () {
-                        provider.toggleMonitoring(item);
-                        setState(() {
-                          item.isMonitoring = !item.isMonitoring;
-                        }); // Cập nhật lại UI khi trạng thái thay đổi
-                      },
                     ),
                   );
                 },
@@ -126,6 +154,22 @@ class _ItemListScreenState extends State<ItemListScreen> {
                                   : null,
                     ),
                   ),
+                  const SizedBox(height: 16),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: TextFormField(
+                      decoration: const InputDecoration(
+                        labelText: 'Giá',
+                        border: OutlineInputBorder(),
+                      ),
+                      controller: priceController,
+                      validator:
+                          (value) =>
+                              value?.isEmpty ?? true
+                                  ? 'Vui lòng nhập giá'
+                                  : null,
+                    ),
+                  ),
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Row(
@@ -137,7 +181,11 @@ class _ItemListScreenState extends State<ItemListScreen> {
                               final newItem = Item(
                                 name: nameController.text,
                                 value: valueController.text,
+                                price:
+                                    double.tryParse(priceController.text) ??
+                                    0.0,
                                 isMonitoring: false,
+                                isInCart: false,
                               );
                               setState(() {
                                 provider?.addItem(newItem);
@@ -145,6 +193,7 @@ class _ItemListScreenState extends State<ItemListScreen> {
 
                               nameController.clear();
                               valueController.clear();
+                              priceController.clear();
                               Navigator.of(context).pop();
                             }
                           },
